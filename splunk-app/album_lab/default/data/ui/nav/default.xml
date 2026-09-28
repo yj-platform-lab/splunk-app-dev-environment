@@ -1,0 +1,3 @@
+<nav search_view="albums">
+  <view name="albums" default="true" />
+</nav>

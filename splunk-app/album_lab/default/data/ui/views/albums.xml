@@ -1,0 +1,10 @@
+<dashboard version="1.1" script="albums.js">
+  <label>Albums</label>
+  <row>
+    <panel>
+      <html>
+        <div id="album-lab-root"></div>
+      </html>
+    </panel>
+  </row>
+</dashboard>

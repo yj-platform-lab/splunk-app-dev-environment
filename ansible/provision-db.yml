@@ -1,0 +1,62 @@
+---
+- name: Provision album database
+  hosts: all
+  gather_facts: false
+
+  vars:
+    db_name: "{{ lookup('ansible.builtin.env', 'MYSQL_DATABASE') }}"
+    db_user: "{{ lookup('ansible.builtin.env', 'MYSQL_APP_USER') }}"
+    root_password: "{{ lookup('ansible.builtin.env', 'MYSQL_ROOT_PASSWORD') }}"
+    app_password: "{{ lookup('ansible.builtin.env', 'MYSQL_APP_PASSWORD') }}"
+    mysql_socket: /var/lib/mysql/mysql.sock
+
+  tasks:
+    - name: Set MySQL root password
+      ansible.mysql.mysql_user:
+        name: root
+        host: localhost
+        plugin: caching_sha2_password
+        plugin_auth_string: "{{ root_password }}"
+        salt: "{{ ('root:' ~ root_password | hash('sha256'))[:20] }}"
+        check_implicit_admin: true
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_unix_socket: "{{ mysql_socket }}"
+        config_file: ""
+      no_log: true
+
+    - name: Create database
+      ansible.mysql.mysql_db:
+        name: "{{ db_name }}"
+        encoding: utf8mb4
+        state: present
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_unix_socket: "{{ mysql_socket }}"
+        config_file: ""
+      no_log: true
+
+    - name: Create application user
+      ansible.mysql.mysql_user:
+        name: "{{ db_user }}"
+        host: localhost
+        plugin: caching_sha2_password
+        plugin_auth_string: "{{ app_password }}"
+        salt: "{{ (db_user ~ ':' ~ app_password | hash('sha256'))[:20] }}"
+        priv: "{{ db_name }}.*:SELECT,INSERT,DELETE"
+        state: present
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_unix_socket: "{{ mysql_socket }}"
+        config_file: ""
+      no_log: true
+
+    - name: Create albums table
+      ansible.mysql.mysql_query:
+        login_user: root
+        login_password: "{{ root_password }}"
+        login_unix_socket: "{{ mysql_socket }}"
+        config_file: ""
+        login_db: "{{ db_name }}"
+        query: "{{ lookup('ansible.builtin.file', playbook_dir ~ '/../lab/init/01_schema.sql') }}"
+      no_log: true

@@ -1,0 +1,2 @@
+numpy==2.2.6
+PyMySQL[rsa]==1.2.0
