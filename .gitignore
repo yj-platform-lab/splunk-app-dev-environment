@@ -1,3 +1,5 @@
 .env
 .venv312/
 .venv/
+terraform-local/
+README_*.md
