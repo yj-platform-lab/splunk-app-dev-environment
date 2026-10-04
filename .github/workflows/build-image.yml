@@ -17,7 +17,7 @@ jobs:
       - name: Download RPMs
         run: |
           mkdir -p packages
-          aws s3 sync s3://splunk-app-ec2-packages-287858436768-ap-northeast-1-an/rpm/ packages/ --recursive
+          aws s3 sync s3://splunk-app-ec2-packages-287858436768-ap-northeast-1-an/rpm/ packages/
 
       - name: Build image
         run: |
