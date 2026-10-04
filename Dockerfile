@@ -15,8 +15,9 @@ RUN dnf install -y python3.14 python3.14-pip \
 WORKDIR /tmp/build
 COPY ./lab/requirements.txt ./lab/requirements-splunk-py313.txt ./
 
-# Python configuration for OS
-RUN /usr/bin/python -m pip install --no-cache-dir -r requirements.txt
+# Install OS Python dependencies and verify PyMySQL is available for Ansible MySQL modules.
+RUN /usr/bin/python -m pip install --no-cache-dir -r requirements.txt \
+    && /usr/bin/python3.14 -c 'import pymysql'
 
 # Splunk Enterprise
 COPY packages/splunk-10.4.3*.rpm /tmp/splunk/

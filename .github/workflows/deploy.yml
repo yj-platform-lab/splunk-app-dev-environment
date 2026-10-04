@@ -35,3 +35,31 @@ jobs:
       - name: Show container logs
         run: docker container logs --tail=80 album-lab
 
+      - name: Provision database
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
+        run: |
+          set -a
+          source app.env
+          set +a
+
+          : "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}"
+          : "${MYSQL_APP_PASSWORD:?Set MYSQL_APP_PASSWORD}"
+
+          # Wait for the MySQL socket to become available.
+          timeout 120s bash -c '
+            until docker exec album-lab \
+              mysqladmin --protocol=socket --user=root ping --silent \
+              >/dev/null 2>&1; do
+              sleep 1
+            done
+          '
+
+          /home/ubuntu/ansible-venv/bin/ansible-playbook \
+            -i 'album-lab,' \
+            -c community.docker.docker \
+            -u root \
+            -e ansible_python_interpreter=/usr/bin/python3.14 \
+            ansible/provision-db.yml
+
