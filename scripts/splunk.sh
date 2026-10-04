@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Prepare the mounted volume for the Splunk user.
+mkdir -p /opt/splunk/var/log || exit 1
+chown -R splunk:splunk /opt/splunk/var || exit 1
+
 # Create the initial admin account before the first start.
 if [ ! -f /opt/splunk/etc/passwd ]; then
     : "${SPLUNK_PASSWORD:?Set SPLUNK_PASSWORD}"
