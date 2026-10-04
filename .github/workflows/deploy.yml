@@ -21,14 +21,17 @@ jobs:
         env:
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
-          docker run -d \
-            --name splunk-lab \
-            -p 8000:8000 \
+          docker container create \
+            --name album-lab \
             --env-file app.env \
             -e SPLUNK_PASSWORD \
+            --mount type=volume,source=album-lab-splunk-var,target=/opt/splunk/var \
+            --mount type=volume,source=album-lab-mysql-data,target=/var/lib/mysql \
+            -p 8002:8000 \
             splunk-app:local
 
-      - name: Show container status
-        run: |
-          docker ps -a --filter name=splunk-lab
-          docker logs --tail=100 splunk-lab
+          docker container start album-lab
+
+      - name: Show container logs
+        run: docker container logs --tail=80 album-lab
+
