@@ -1,0 +1,27 @@
+name: Build image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: [self-hosted, splunk-app]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download RPMs
+        run: |
+          mkdir -p packages
+          aws s3 cp s3://splunk-app-ec2-packages-287858436768-ap-northeast-1-an/rpm/ packages/ --recursive
+
+      - name: Build image
+        run: |
+          source app.env
+          docker build \
+            --build-arg SPLUNK_APP_NAME="$SPLUNK_APP_NAME" \
+            -t splunk-app:local .
