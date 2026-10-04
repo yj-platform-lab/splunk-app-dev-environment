@@ -1,0 +1,18 @@
+name: Check runner and Docker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check runner user
+        run: whoami
+
+      - name: Check Docker
+        run: docker version
+
+      - name: Check containers
+        run: docker ps
