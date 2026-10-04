@@ -1,0 +1,31 @@
+name: Start container
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, splunk-app]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check image
+        run: docker image inspect splunk-app:local > /dev/null
+
+      - name: Start container
+        run: |
+          docker run -d \
+            --name splunk-lab \
+            -p 8000:8000 \
+            --env-file app.env \
+            splunk-app:local
+
+      - name: Show container status
+        run: |
+          docker ps -a --filter name=splunk-lab
+        docker logs --tail=100 splunk-lab
