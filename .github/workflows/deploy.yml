@@ -18,11 +18,14 @@ jobs:
         run: docker image inspect splunk-app:local > /dev/null
 
       - name: Start container
+        env:
+          SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
           docker run -d \
             --name splunk-lab \
             -p 8000:8000 \
             --env-file app.env \
+            -e SPLUNK_PASSWORD \
             splunk-app:local
 
       - name: Show container status
