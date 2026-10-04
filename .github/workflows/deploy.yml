@@ -28,4 +28,4 @@ jobs:
       - name: Show container status
         run: |
           docker ps -a --filter name=splunk-lab
-        docker logs --tail=100 splunk-lab
+          docker logs --tail=100 splunk-lab
